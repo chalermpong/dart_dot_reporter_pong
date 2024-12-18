@@ -127,16 +127,16 @@ class DotReporter {
 
     switch (model.state) {
       case State.Failure:
-        base += _red('${model.filename}: ${model.name}');
+        base += _red(model.info);
         break;
       case State.Skipped:
-        base += _yellow(model.name);
+        base += _yellow(model.info);
         break;
       case State.Success:
-        base += _green(model.name);
+        base += _green(model.info);
         break;
       default:
-        base += model.name;
+        base += model.info;
         break;
     }
 
