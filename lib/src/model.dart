@@ -7,6 +7,7 @@ enum State {
 class TestModel {
   final int id;
   final String name;
+  final String filename;
   String? error;
   String? message;
   State? state;
@@ -14,8 +15,11 @@ class TestModel {
   TestModel({
     required this.id,
     required this.name,
+    this.filename = '',
     this.state,
   });
+
+  String get info => '$filename: $name';
 
   @override
   bool operator ==(Object other) {
@@ -31,6 +35,6 @@ class TestModel {
 
   @override
   String toString() {
-    return 'TestModel { $id $state $name $error $message }';
+    return 'TestModel { $id $state $name $filename $error $message }';
   }
 }

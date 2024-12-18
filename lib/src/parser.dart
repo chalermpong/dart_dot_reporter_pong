@@ -43,6 +43,7 @@ class Parser {
       tests.putIfAbsent(id, () => TestModel(
         id: id,
         name: name,
+        filename: line['test']['url'],
         state: line['test']['metadata']['skip'] ? State.Skipped : null,
       ));
 
