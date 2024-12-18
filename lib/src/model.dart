@@ -19,7 +19,7 @@ class TestModel {
     this.state,
   });
 
-  String get info => '$filename: $name';
+  String get info => '[$id] $filename: $name';
 
   @override
   bool operator ==(Object other) {

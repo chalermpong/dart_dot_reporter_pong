@@ -1,6 +1,6 @@
 name: dart_dot_reporter_pong
 description: A starting point for Dart libraries or applications.
-version: 1.0.4
+version: 1.0.5
 # repository: https://github.com/my_org/my_repo
 
 environment:
