@@ -37,8 +37,9 @@ class DotReporter {
     _countTestResults();
     final resultIconsLine = _renderSingleLineOfIcons();
     final result = _renderShortResultLines();
+    final filenames = _renderFileNames();
 
-    _render(resultIconsLine, result);
+    _render(resultIconsLine, result, filenames);
 
     if (skippedCount > 0 && failSkipped) {
       exitCode = 1;
@@ -48,13 +49,18 @@ class DotReporter {
     }
   }
 
-  void _render(String resultIconsLine, String result) {
+  void _render(String resultIconsLine, String result, String filenames) {
     out.write(resultIconsLine);
 
     out.writeln();
     out.writeln();
 
     out.write(result);
+
+    out.writeln();
+    out.writeln();
+
+    out.write('Files:\n$filenames');
 
     out.writeln();
     out.writeln();
@@ -72,21 +78,28 @@ class DotReporter {
   }
 
   String _renderShortResultLines() {
-    return parser.tests.values
-        .where((i) {
-      final hideSuccess = !showSuccess && i.state == State.Success;
-      final _hideSkipped = hideSkipped && i.state == State.Skipped;
-      if (_hideSkipped) {
-        return false;
-      }
-      if (hideSuccess) {
-        return false;
-      }
+    return parser.tests.values.where(filterTest).map(_testToString).join('\n');
+  }
 
-      return true;
-    })
-        .map(_testToString)
-        .join('\n');
+  String _renderFileNames() {
+    final Set<String> filenames = Set.from(parser.tests.values
+        .where(filterTest)
+        .map((i) => _formatColor(i.state, i.filename)));
+
+    return filenames.join('\n');
+  }
+
+  bool filterTest(TestModel i) {
+    final hideSuccess = !showSuccess && i.state == State.Success;
+    final _hideSkipped = hideSkipped && i.state == State.Skipped;
+    if (_hideSkipped) {
+      return false;
+    }
+    if (hideSuccess) {
+      return false;
+    }
+
+    return true;
   }
 
   String _renderSingleLineOfIcons() =>
@@ -124,21 +137,7 @@ class DotReporter {
 
   String _testToString(TestModel model) {
     var base = _getIcon(model) + ' ';
-
-    switch (model.state) {
-      case State.Failure:
-        base += _red(model.info);
-        break;
-      case State.Skipped:
-        base += _yellow(model.info);
-        break;
-      case State.Success:
-        base += _green(model.info);
-        break;
-      default:
-        base += model.info;
-        break;
-    }
+    base += _formatColor(model.state, model.info);
 
     if (model.state == State.Failure && showMessage) {
       if (model.error != null) {
@@ -152,6 +151,19 @@ class DotReporter {
       return '${model.id} $base';
     }
     return base;
+  }
+
+  String _formatColor(State? state, String text) {
+    switch (state) {
+      case State.Failure:
+        return _red(text);
+      case State.Skipped:
+        return _yellow(text);
+      case State.Success:
+        return _green(text);
+      default:
+        return text;
+    }
   }
 
   String _red(String text) {
