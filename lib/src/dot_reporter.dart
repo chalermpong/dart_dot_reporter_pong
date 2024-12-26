@@ -36,7 +36,7 @@ class DotReporter {
 
     _countTestResults();
     final resultIconsLine = _renderSingleLineOfIcons();
-    final result = _renderShortResultLines();
+    final result = '${_renderShortResultLines()}${_renderFileNames()}';
     final filenames = _renderFileNames();
 
     _render(resultIconsLine, result, filenames);
@@ -57,12 +57,6 @@ class DotReporter {
 
     out.write(result);
 
-    out.writeln();
-    out.writeln();
-
-    out.write('Files:\n$filenames');
-
-    out.writeln();
     out.writeln();
 
     out.writeAll(
@@ -86,7 +80,11 @@ class DotReporter {
         .where(filterTest)
         .map((i) => _formatColor(i.state, i.filename)));
 
-    return filenames.join('\n');
+    if (filenames.isEmpty) {
+      return '';
+    }
+
+    return '\n\n${filenames.join('\n')}';
   }
 
   bool filterTest(TestModel i) {
@@ -136,15 +134,15 @@ class DotReporter {
   }
 
   String _testToString(TestModel model) {
-    var base = _getIcon(model) + ' ';
+    var base = '${_getIcon(model)} ';
     base += _formatColor(model.state, model.info);
 
     if (model.state == State.Failure && showMessage) {
       if (model.error != null) {
-        base += '\n' + model.error!;
+        base += '\n${model.error!}';
       }
       if (model.message != null) {
-        base += '\n' + model.message!;
+        base += '\n${model.message!}';
       }
     }
     if (showId) {
@@ -170,20 +168,20 @@ class DotReporter {
     if (noColor) {
       return text;
     }
-    return '\x1B[31m' + text + '\x1B[0m';
+    return '\x1B[31m$text\x1B[0m';
   }
 
   String _green(String text) {
     if (noColor) {
       return text;
     }
-    return '\x1B[32m' + text + '\x1B[0m';
+    return '\x1B[32m$text\x1B[0m';
   }
 
   String _yellow(String text) {
     if (noColor) {
       return text;
     }
-    return '\x1B[33m' + text + '\x1B[0m';
+    return '\x1B[33m$text\x1B[0m';
   }
 }
